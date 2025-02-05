@@ -15,6 +15,9 @@ module.exports = defineConfig({
   },
   modules: [
     {
+      resolve: './src/modules/marketplace',
+    },
+    {
       resolve: "@medusajs/medusa/notification",
       options: {
         providers: [
