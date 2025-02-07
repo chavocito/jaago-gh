@@ -2,7 +2,7 @@ import {
     createStep,
     StepResponse,
 } from "@medusajs/framework/workflows-sdk"
-import { CreateVendorAdminWorkflowInput } from ".."
+import { CreateVendorAdminWorkflowInput } from "../"
 import MarketplaceModuleService from "../../../../modules/marketplace/service"
 import { MARKETPLACE_MODULE } from "../../../../modules/marketplace"
 
@@ -20,7 +20,6 @@ const createVendorAdminStep = createStep(
     async (vendorAdmin, { container }) => {
         const marketplaceModuleService: MarketplaceModuleService =
             container.resolve(MARKETPLACE_MODULE)
-
         marketplaceModuleService.deleteVendorAdmins(vendorAdmin.id)
     }
 )
