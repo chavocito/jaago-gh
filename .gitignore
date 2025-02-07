@@ -1,3 +1,4 @@
 ./jaago-gh-backend/node_modules/
+./jaago-gh-backend/.env
 ./jaago-gh-storefront/node_modules/
 ./jaago-gh-storefront/.env
