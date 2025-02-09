@@ -42,4 +42,27 @@ export const POST = async (
 
     const  { admin, ...vendorData } = schema.parse(req.body) as RequestBody
     const marketplaceModuleService: MarketplaceModuleService = req.scope.resolve("marketplaceModuleService")
+
+    //create vendor
+    let vendor = await marketplaceModuleService.createVendorAdmins([vendorData])
+
+    //create vendor domain
+    await createVendorAdminWorkflow(req.scope)
+        .run({
+            input: {
+                admin: {
+                    ...admin,
+                    vendor_id: vendor[0].id,
+                },
+                authIdentityId: req.auth_context.auth_identity_id,
+            },
+        })
+
+    vendor = await marketplaceModuleService.retrieveVendor(vendor[0].id, {
+        relations: ["admins"]
+    })
+
+    res.json({
+        vendor,
+    })
 }
