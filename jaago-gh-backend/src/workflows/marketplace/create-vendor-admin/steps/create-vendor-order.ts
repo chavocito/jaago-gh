@@ -31,6 +31,29 @@ function prepareOrderData(
     parentOrder: OrderDTO
 ) {
     // TODO format order data
+    if (vendorIds.length === 1) {
+        linkDefs.push({
+          [MARKETPLACE_MODULE]: {
+            vendor_id: vendors[0].id,
+          },
+          [Modules.ORDER]: {
+            order_id: parentOrder.id,
+          },
+        })
+      
+        createdOrders.push({
+          ...parentOrder,
+          vendor: vendors[0],
+        })
+        
+        return new StepResponse({
+          orders:  createdOrders,
+          linkDefs,
+        }, {
+          created_orders: [],
+        })
+      }
+    
 }
 
 const createVendorOrdersStep = createStep(
@@ -83,6 +106,41 @@ const createVendorOrdersStep = createStep(
     },
     async ({ created_orders }, { container, context }) => {
         // TODO add compensation function
+        try {
+            await promiseAll(
+              vendorIds.map(async (vendorId) => {
+                const items = vendorsItems[vendorId]
+                const vendor = vendors.find((v) => v.id === vendorId)!
+          
+                const { result: childOrder } = await createOrderWorkflow(
+                  container
+                )
+                .run({
+                  input: prepareOrderData(items, parentOrder),
+                  context,
+                }) as unknown as { result: VendorOrder }
+          
+                childOrder.vendor = vendor
+                createdOrders.push(childOrder)
+                
+                linkDefs.push({
+                  [MARKETPLACE_MODULE]: {
+                    vendor_id: vendor.id,
+                  },
+                  [Modules.ORDER]: {
+                    order_id: childOrder.id,
+                  },
+                })
+              })
+            )
+          } catch (e) {
+            return StepResponse.permanentFailure(
+              `An error occured while creating vendor orders: ${e}`,
+              {
+                created_orders: createdOrders,
+              }
+            )
+          }
     }
 )
 
