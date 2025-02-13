@@ -31,5 +31,12 @@ export default defineMiddlewares({
                 validateAndTransformBody(AdminCreateProduct),
             ],
         },
+        {
+            matcher: "/admin/orders/*",
+            method: "POST",
+            middlewares: [
+                authenticate("vendor", ["session", "bearer"]),
+            ],
+        },
     ],
 })
